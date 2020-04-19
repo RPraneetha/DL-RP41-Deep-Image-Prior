@@ -76,19 +76,19 @@ class SkipArchitecture(nn.Module):
                  kernel_size_down, kernel_size_up, kernel_size_skip, upsample_mode):
         super(SkipArchitecture, self).__init__()
         self.downModules = nn.ModuleList([Downsample(input_channels, filters_down[i], kernel_size_down[i],
-                                                     int((kernel_size_down[i] - 1) / 2)) for i in range(filters_down)])
+                                                     int((kernel_size_down[i] - 1) / 2)) for i in range(len(filters_down))])
         self.upModules = nn.ModuleList([Upsample(input_channels, filters_up[i],
                                                  filters_skip[i] + (filters_up[i + 1] if i < len(filters_down) - 1
                                                                     else filters_down[i]),
                                                  upsample_mode, kernel_size_up[i],
-                                                 int((kernel_size_up[i] - 1) / 2)) for i in range(filters_up)])
+                                                 int((kernel_size_up[i] - 1) / 2)) for i in range(len(filters_up))])
         self.skip_connections = nn.ModuleList([SkipConnection(input_channels, filters_skip[i], kernel_size_skip[i],
                                                               int((kernel_size_up[i] - 1) / 2))
-                                               for i in range(filters_up)])
+                                               for i in range(len(filters_up))])
 
         self.cnn_last = nn.Conv2d(filters_up[0], output_channels, 1, stride=1)
         self.sigmoid = nn.Sigmoid()
-        self.number_of_channels = filters_down.length
+        self.number_of_channels = len(filters_down)
 
     def forward(self, x):
         for i in range(self.number_of_channels):
