@@ -285,7 +285,7 @@ Image restoration is a variant of the inpainting problem, and uses the same data
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](/results/image_restoration/lena_orig.png)  |  ![](/results/image_restoration/lena_noise.png) | ![](/results/image_restoration/lena_recon.png)
 ![](/results/image_restoration/man_orig.png)  |  ![](/results/image_restoration/man_noise.png) | ![](/results/image_restoration/man_recon.png)
-![](/results/image_restoration/montage_orig.png)  |  ![](/results/image_restoration/montage_noisy.png) | ![](/results/image_restoration/montage_restored.png)
+![](/results/image_restoration/montage_orig.jpeg)  |  ![](/results/image_restoration/montage_noisy.png) | ![](/results/image_restoration/montage_restored.png)
 
 
 
