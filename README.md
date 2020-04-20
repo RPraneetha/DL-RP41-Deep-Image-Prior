@@ -13,13 +13,16 @@ The goal of this project is to reproduce [figure 7](https://arxiv.org/pdf/1711.1
 
 ## A Few Formulae 
 Neural networks usually used in practice, specifically trained networks which first learn from date and then are applied to solve image tasks 
-use $$x=f_\theta(z)$$, where $$x$$ is an image which is mapped to a random code vector $$z$$. The network described in this paper
+use 
+<div align="center">$$x=f_\theta(z)$$</div> where $$x$$ is an image which is mapped to a random code vector $$z$$. The network described in this paper
  captures the information learnt solely on the basis of its architecture, without learning any of its parameters. This is done by
   considering the network itself as a parameterization of the input image.
     
-Image restoration tasks can be formulated as minimizing the term $$x^* = \min_{x} E(x; x_0) + R(x)$$ where $$ E(x; x_0) $$ is a task-dependent
+Image restoration tasks can be formulated as minimizing the term 
+<div align="center">$$x^* = \min_{x} E(x; x_0) + R(x)$$ </div> where $$ E(x; x_0) $$ is a task-dependent
  data term, $$x_0$$ is the corrupted image and $$R(x)$$ is the regularizer. This regularizer is replaced with the implicit prior captured 
-  by the network as $$\theta^* = argmin_{x} E(f_\theta(z); x_0)$$ consequently formulating the problem as $$x^* = f_\theta^*(z)$$
+  by the network as 
+  <div align="center">$$\theta^* = argmin_{x} E(f_\theta(z); x_0)$$ </div> consequently formulating the problem as $$x^* = f_\theta^*(z)$$
 
 ## Playing Architect
 This paper uses a handcrafted encoder-decoder architecture with skip connections as shown in [Figure 1](#Skip-Architecture) 
@@ -27,8 +30,8 @@ This paper uses a handcrafted encoder-decoder architecture with skip connections
 
 ![Skip-Architecture](/assets/skip_architecture.png)
 
-The architecture is based on a U-net "hourglass",  and is a fully-convolutional encoder-decoder architecture, where the input of the network _z_ has 
- the same spatial resolution as the output of the image _f(z)_. LeakyRELU is used as a non-linearity, and the downsampling method technique used is strides, 
+The architecture is based on a U-net "hourglass",  and is a fully-convolutional encoder-decoder architecture, where the input of the network $$z$$ has 
+ the same spatial resolution as the output of the image $$f(z)$$. LeakyRELU is used as a non-linearity, and the downsampling method technique used is strides, 
   implemented within the convoltuional modules. Upsampling operation is nearest neighbour upsampling for the inpainting application, and bilinear for image restoration.
    We have used reflective padding in all the convolutional layers. For the input $$z$$ we have generated noise randomly using Bernoulli sampling, and for the 
     optimization process, we have used the _ADAM_ optimizer. The optimal results can be obtained when the network is carefully 
@@ -41,6 +44,7 @@ The authors have given the hyperparameters they have used in the implementation 
   we have used the parameters as given in the code. (We have tested our code with both the sets of hyperparameters and did not find any significant difference.) 
   <br />
   The standard architecture uses the following set of hyperparameters: <br /> <br />
+  <div align="center">
    $$\boxed{
    z \in \mathbb{R}^{32xHxW} \sim U(0, \frac{1}{10}) \\
    n_u = n_d = [128, 128, 128, 128, 128] \\
@@ -53,6 +57,7 @@ The authors have given the hyperparameters they have used in the implementation 
    upsampling = bilinear
    }
    $$
+   </div>
 
 ## Get the Data
 
@@ -112,7 +117,7 @@ We have modularized the architecture of the network and divided it into 3, `Down
   class.
 
 `DownsampleModule`
-```jupyterpython
+```python
 class DownsampleModule(nn.Module):
     def __init__(self, input_depth, num_filters, kernel_size, pad_size):
         super(DownsampleModule, self).__init__()
@@ -137,7 +142,7 @@ class DownsampleModule(nn.Module):
 ```
 
 `UpsampleModule`
-```jupyterpython
+```python
 class UpsampleModule(nn.Module):
     def __init__(self, input_depth, num_filters, kernel_size, pad_size, upsample_mode):
         super(UpsampleModule, self).__init__()
@@ -167,7 +172,7 @@ class UpsampleModule(nn.Module):
 ```
 
 `SkipConnection`
-```jupyterpython
+```python
 class SkipConnection(nn.Module):
     def __init__(self, input_depth, num_filters, kernel_size, pad_size):
         super(SkipConnection, self).__init__()
@@ -185,9 +190,11 @@ class SkipConnection(nn.Module):
         return x
 ```
 
+The network defined in the downsampling, upsampling and the skip connections is as provided in the supplementary.
+
 #### SkipArchitecture
 ![It's all coming together](https://media.giphy.com/media/KEYEpIngcmXlHetDqz/giphy.gif)
-```jupyterpython
+```python
 class SkipArchitecture(nn.Module):
     def __init__(self, input_channels, output_channels, filters_down, filters_up, filters_skip,
                  kernel_size_down, kernel_size_up, kernel_size_skip, upsample_mode):
@@ -233,12 +240,82 @@ class SkipArchitecture(nn.Module):
         return x
 ```
 
+We have chosen to concatenate the skip connections similar to a U-Net connection.
+
 ### Inpainting
 
+The inpainting task we aim to solve is to reconstruct the original image given an image with missing pixels. A text and mask overlay can also 
+ be constructed similarly as a missing pixels problem. The data term we use for inpainting is <br />
+<div align="center"> $$E(x;x_0) = ||(x - x_0) \odot m||^2$$ </div>
+where $$\odot$$ is Hadamard's product. The prior captured by the network utilizes the context of the image and interpolates the missing pixels
+from the known parts.
+<style>
+.tablelines table, .tablelines td, .tablelines th {
+        border: 1px solid white;
+        }
+</style>
+Original             |  Corrupted              | Restored
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/results/inpainting/autumn_orig.png)  |  ![](/results/inpainting/autumn_mask.png) | ![](/results/inpainting/autumn_result.png)
+![](/results/inpainting/dump_orig.png)  |  ![](/results/inpainting/dump_mask.png) | ![](/results/inpainting/dump_recon.png)
+![](/results/inpainting/kate_orig.png)  |  ![](/results/inpainting/kate_mask.png) | ![](/results/inpainting/kate_result.png)
+![](/results/inpainting/kate_orig.png)  |  ![](/results/inpainting/kate_3.png) | ![](/results/inpainting/kate_3_res.png)
+![](/results/inpainting/kate_orig.png)  |  ![](/results/inpainting/kate_rect_6000.png) | ![](/results/inpainting/kate_rect_result.png)
 
+{: .tablelines}
 ### Image Restoration
+Image restoration is a variant of the inpainting problem, and uses the same data term. The hyperparameters for this task 
+ differs from the default architecture, as given below:
+ <div align="center">
+ $$\boxed{
+   z \in \mathbb{R}^{32xHxW} \sim U(0, \frac{1}{10}) \\
+   n_u = n_d = [128, 128, 128, 128, 128] \\
+   k_u = k_d = [3, 3, 3, 3, 3] \\
+   n_s = [4, 4, 4, 4, 4] \\
+   k_s = [1, 1, 1, 1, 1] \\
+   \sigma_p = \frac{1}{30} \\
+   num_iter = 11000 \\
+   LR = 0.001 \\
+   upsampling = bilinear
+   }
+   $$
+ </div>
+ 
+ Original             |  Corrupted              | Restored
+:-------------------------:|:-------------------------:|:-------------------------:
+![](/results/image_restoration/lena_orig.png)  |  ![](/results/image_restoration/lena_noise.png) | ![](/results/image_restoration/lena_recon.png)
+![](/results/image_restoration/man_orig.png)  |  ![](/results/image_restoration/man_noise.png) | ![](/results/image_restoration/man_recon.png)
+![](/results/image_restoration/montage_orig.png)  |  ![](/results/image_restoration/montage_noisy.png) | ![](/results/image_restoration/montage_restored.png)
 
-## Results
+
+
+|   |  Barbara | Boat  | House  | Lena  | Peppers  | C.man  | Couple  | Finger  | Hill  | Man  | Montage  |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Deep Image Prior(Original) | 32.22 | 33.06 | 39.16 | 36.16 | 33.05 | 29.8 | 32.52 | 32.84 | 32.77 | 32.20 | 34.54 |
+| Reproduced results(Ours) | 30.97 | 33.93 | 41.59 | 36.56 | 32.79 | 30.33 | 33.17 | 31.07 | 35.35 | 34.71 | 36.93 |
+{: .tablelines}
+
+The results we have obtained are similar to the ones obtained in the original paper, hence proving a successful reproduction of the code.
+
+Images from the results can be found in `results` folder in case you do not want to execute the Jupyter notebooks and only want to see the end results.
 
 ## So is all this enough for a course project?
+
+The criteria for completing the project is to reproduce the paper, without using any pre-existing code, or to reproduce an existing code implementation along with some
+additional criteria.
+The criteria we have chosen are the following:
+* Reproduced
+* Evaluate existing code
+* New data
+* New code variant
+
+We have written about the evaluation of existing code above, where we mentioned that the code could be increased in readability and understandability
+ and could be modularized for re-use and easier debugging. While we were evaluating the code, we felt that a different implementation which improved up on the code 
+  in the mentioned aspects. We have also used new data to evaluate our network, and as can be seen from the inpainting results, the network successfully solved
+   the task for the new data too.
+
+## References
+
+[1] Ulyanov, D., Vedaldi, A., Lempitsky, V. (2018). Deep image prior. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 9446–9454).
+
 
