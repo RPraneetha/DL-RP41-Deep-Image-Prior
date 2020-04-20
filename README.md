@@ -1,5 +1,7 @@
 # Reproducing Inpainting and Image Restoration from [Deep Image Prior](https://arxiv.org/pdf/1711.10925.pdf)
 
+Debadeep Basu - 5089107 - d.basu-1@student.tudelft.nl
+Ramya Praneetha Ghantasala - 5014212 - r.p.ghantasala@student.tudelft.nl
 ## Introduction
 The goal of this project is to reproduce [figure 7](https://arxiv.org/pdf/1711.10925.pdf#figure.caption.7) and [table
  1](https://arxiv.org/pdf/1711.10925.pdf#table.caption.8) of the paper Deep Image Prior by Dmitry Ulyanov et. al. The
