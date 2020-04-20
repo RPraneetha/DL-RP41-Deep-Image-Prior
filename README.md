@@ -20,7 +20,7 @@ which was provided in the [supplementary material](https://box.skoltech.ru/index
 We can see that the architecture is similar to a U-net "hourglass" architecture, where the input of the network _z_ has 
  the same spatial resolution as the output of the image _f(z)_. The optimal results can be obtained when the network is 
   carefully tuned to a particular task, hence the parameters and the architecture differs a little for each task. **Insert math about architecture**
-  $m \in {0,1}^{H \times W}$
+  $$\forall x \in R$$
   
  ## Parameters
  
