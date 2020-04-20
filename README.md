@@ -314,6 +314,12 @@ We have written about the evaluation of existing code above, where we mentioned 
   in the mentioned aspects. We have also used new data to evaluate our network, and as can be seen from the inpainting results, the network successfully solved
    the task for the new data too.
 
+<br />
+<br />
+<br />
+
+To find more such reproduced papers and projects, you can head on to [this website](https://reproducedpapers.org).
+
 ## References
 
 [1] Ulyanov, D., Vedaldi, A., Lempitsky, V. (2018). Deep image prior. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 9446–9454).
